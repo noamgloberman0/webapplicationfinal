@@ -1,20 +1,60 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { register } from '../services/authService';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [imageFile, setImageFile] = useState(new Blob());
+  const [imageName, setImageName] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [formData, setFormData] = useState(new FormData());
 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Signup logic here
+    if (password !== confirmPassword) {
+      alert('Passwords do not match');
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('username', username);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('city', city);
+      formData.append('country', country);
+      formData.append('profilePicture', imageName);
+      formData.append('profile-pic', imageFile, imageName);
+
+      const result = await register(formData);
+      if (result?.status === 200) {
+        window.location.href = '/login';
+      } else {
+        // Display the specific error message from the backend
+        alert(result?.data?.message || 'Registration failed');
+      }
+    } catch (error) {
+      console.error('Error registering:', error);
+      alert('Error registering user');
+    }
   };
 
+  const handleUpload = async(e: any) => {
+
+    e.preventDefault();
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const fileName = `${email}.${fileExtension}`;
+
+    await setImageName(fileName);
+    await setImageFile(e.target.files[0]);
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -107,7 +147,7 @@ export default function SignUp() {
               <label htmlFor='profilePicture' className="block text-sm font-medium text-gray-700">
                 Profile Picture
               </label>
-              {/* <input type = "file" id = "profilePictureRegister" onChange = {handleUpload}/> */}
+              <input type = "file" id = "profilePictureRegister" onChange = {handleUpload}/>
             </div>
 
             <button

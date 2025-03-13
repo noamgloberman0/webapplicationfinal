@@ -1,13 +1,29 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
+// Services
+import { login } from '../services/authService';
+
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Login logic here
+    
+    try {
+      const result = await login(email, password);
+      if(result?.status === 200) {
+        window.location.href = '/home';        
+      }
+      else {
+        alert('Invalid email or password');
+      };
+    }
+    catch (error) {
+      console.error('Error logging in:', error);
+      alert('Error logging in');
+    };
     
   };
 
