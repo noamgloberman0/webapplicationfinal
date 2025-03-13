@@ -25,17 +25,18 @@ export const login = async (user_email: string, password: string) => {
   }
 };
 
-// export const register = async (formData: FormData) => {
-//     try {
-//     //   
-//     } catch (error: any) {
-//         if (error.response) {
-//             // Return the error response so we can handle it in the component
-//             return error.response;
-//         }
-//         throw error;
-//     }
-// }
+export const register = async (formData: FormData) => {
+    try {
+        const response = await axios.post(`${BACKEND_URL}/auth/register`, formData);
+        return response;
+    } catch (error: any) {
+        if (error.response) {
+            // Return the error response so we can handle it in the component
+            return error.response;
+        }
+        throw error;
+    }
+}
 
 export const verify = async () => {
   try {
