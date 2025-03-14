@@ -7,6 +7,7 @@ import PersistLogin from './components/persistLogin';
 
 // Pages
 import Home from './pages/Home';
+import Profile from './pages/Profile';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 
@@ -25,13 +26,13 @@ function App() {
                   <Home />   
                 </> 
               }/>
-              {/* <Route path="/profile/:id" element={
+              <Route path="/profile/:id" element={
                   <>
                     <Navbar />
                     <Profile />
                   </>
                 }/>
-               */}
+              
             </Route>
             
           </Routes>
