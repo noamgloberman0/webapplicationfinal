@@ -12,7 +12,8 @@ import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 
 // Services
-import { getUser } from '../services/usersService';
+import { getUser, updateUser } from '../services/usersService';
+import { updateImage } from '../services/globalService';
 
 export default function Profile() {
   const id: any = localStorage.getItem('_id');
@@ -36,7 +37,6 @@ export default function Profile() {
     getPosts();
     setEditMode(false);
   }, [profileID]);
-
 
   const getUserDetails = async (profileID: string) => {
 
@@ -65,12 +65,46 @@ export default function Profile() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Add edit profile logic here
+    setEditMode(false);
+    const formData = new FormData();
+    formData.append('id', id);
+    formData.append('username', username);
+    formData.append('profilePicture', imageName);
+
+    const response = await updateUser(formData);
+
+    if (updatedImage) {
+      formData.delete("username");
+      formData.delete("id");
+      formData.delete("profilePicture");
+      formData.append('image', imageFile, imageName);
+
+      const updateImageResponse = await updateImage(formData);
+
+      if (updateImageResponse?.status === 200) {
+        localStorage.setItem('profilePicture', `/images/${imageName}`);
+      }
+
+    }
+
+    setUpdatedImage(false);
+    console.log(response?.data);
+
+    if (response?.status === 200) {
+      window.location.reload()
+    } else{
+      alert('Email or username are already in use');
+    }
   };
 
   const handleUpload = async(e: any) => {
     e.preventDefault();
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const fileName = `${user?.email}.${fileExtension}`;
 
+    setImageName(fileName);
+    setImageFile(e.target.files[0]);
+    setUpdatedImage(true);
 
   }
 
