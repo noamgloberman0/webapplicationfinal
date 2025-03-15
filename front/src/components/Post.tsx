@@ -6,6 +6,7 @@ import { Post as PostType } from '../types';
 
 // Services
 import { likePost } from '../services/postService';
+import { createComment, fetchComments } from '../services/commentService';
 
 // Icons
 import { Heart, MessageCircle } from 'lucide-react';
@@ -19,6 +20,10 @@ export default function Post({ post }: PostProps) {
   // User info
   const [userInfo] = useState(post?.user ? JSON.parse(post.user) : {});
   const userID = localStorage.getItem('_id') || '';
+  const user = {
+    name: localStorage.getItem('username') || '',
+    profilePicture: localStorage.getItem('profilePicture') || '',
+  };
 
   // Likes
   const [isLiked, setIsLiked] = useState(false);
@@ -28,6 +33,17 @@ export default function Post({ post }: PostProps) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [postComments, setPostComments] = useState<any>([]);
+
+  // Get comments of post
+  useEffect(() => {
+
+    const getComments = async (postId: string) => {
+      const result = await fetchComments(postId);
+      setPostComments(result?.data);      
+    }
+
+    getComments(post._id);
+  }, [post]);
   
   // Check if the current user has liked the post 
   useEffect(() => {
@@ -56,8 +72,30 @@ export default function Post({ post }: PostProps) {
 
   const handleNewComment = async (e: React.FormEvent) => {
     e.preventDefault();
-    // New comment logic here
+    if (!newComment.trim()) return;
+
+    const formData = new FormData();
+    
+    formData.append('user', JSON.stringify(user)); // Comment Sender
+    formData.append('postId', post._id); // Post ID to comment on
+    formData.append('content', newComment); // Comment content
+
+    const result = await createComment(formData);
+    
+    // In a real app, this would be handled by the backend
+    setNewComment('');
+
+    if(result?.status === 200) {
+      window.location.href = `/home#${post._id}`;
+      window.location.reload();
+    }
+    else {
+      console.error('Error creating comment:', result);
+      alert('Something went wrong while creating your comment. Please try again later.');
+    }
   };
+
+
 
   return (
     <div id={post._id} className="bg-white rounded-lg shadow-md mb-6">
@@ -82,6 +120,7 @@ export default function Post({ post }: PostProps) {
               </p>
             </div>
           </div>
+
         </div>
 
         <p className="mb-4">{post.content}</p>
@@ -132,6 +171,40 @@ export default function Post({ post }: PostProps) {
             />
           </form>
 
+          <div className="space-y-4">
+            {postComments.length > 0 && postComments.map((comment: any) => (
+              <div key={comment._id} id={comment._id} className="flex items-start space-x-3">
+                
+                {/* Comment Creator */}
+                <img
+                  src={comment?.user ? JSON.parse(comment.user).profilePicture : ""}
+                  alt={comment?.user ? JSON.parse(comment.user).name : ""}
+                  className="w-8 h-8 rounded-full"
+                />
+                
+                <div className='bg-gray-100 w-full p-2 rounded-lg flex items-start space-x-3'>
+
+                  {/* Comment Content */}
+                  <div className="flex-1">
+
+                    <div className="rounded-lg p-3">
+                      <Link to={`/profile/${comment.userId}`}>
+                        <span className="font-semibold">{comment?.user ? JSON.parse(comment.user).name : ""}</span>
+                      </Link>
+   
+                      <p>{comment.content}</p>
+
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </p>
+
+                  </div>
+
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
