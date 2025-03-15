@@ -1,22 +1,63 @@
 import React, { useState } from 'react';
-
-// Icons
+import { createPost } from '../services/postService';
 import { Image, X } from 'lucide-react';
+import { updateImage } from '../services/globalService';
 
 export default function CreatePost() {
   const [content, setContent] = useState('');
   const [imageFile, setImageFile] = useState(new Blob());
   const [imageName, setImageName] = useState('');
 
+  const user = {
+    name: localStorage.getItem('username') || '',
+    profilePicture: localStorage.getItem('profilePicture') || '',
+  };
 
   const handleUpload = async(e: any) => {
-    e.preventDefault();    
-  
+    e.preventDefault();
+    
+    const imgFileName = e.target.files[0].name.split('.')[0];
+    const fileExtension = e.target.files[0].name.split('.').pop();
+    const now = new Date();
+    const timestamp = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}_${now.getHours().toString().padStart(2, '0')}-${now.getMinutes().toString().padStart(2, '0')}-${now.getSeconds().toString().padStart(2, '0')}`;
+    const fileName = `${user.name.replace(/\s+/g, '_')}-${imgFileName.replace(/\s+/g, '_')}-${timestamp}.${fileExtension}`;
+
+    setImageName(fileName);
+    setImageFile(e.target.files[0]);
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!content.trim()) return;
+  
+    try {
+      const formData = new FormData();
+      
+      // Try first uploading the image
+      formData.append('image', imageFile, imageName);
+      const result = await updateImage(formData);
+      
+      // Create the post
+      if(result?.status === 200) {
+        formData.delete("image");
 
+        formData.append('user', JSON.stringify(user));
+        formData.append('content', content);
+        formData.append('image', "/images/" + imageName);
+
+        await createPost(formData);
+        window.location.reload();
+      }
+    }
+    catch (error) {
+      console.error('Error creating post:', error);
+      alert('Something went wrong while creating the post, Please try again later');
+    }
+
+    // Clean the new post form
+    setImageFile(new Blob());
+    setImageName('');
+    setContent('');
   };
 
   return (
@@ -26,7 +67,7 @@ export default function CreatePost() {
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            placeholder={"What's on your mind?"}
+            placeholder={"Generating content..."}
             className="w-full p-4 rounded-lg border focus:outline-none focus:border-indigo-500 resize-none"
             rows={3}
           />

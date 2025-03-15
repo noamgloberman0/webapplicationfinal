@@ -17,8 +17,19 @@ export default function Home() {
   }, []);
 
   const getPosts = async () => {
-    // Get posts logic here
-    // fetchPosts()
+    try {
+      const result = await fetchPosts();
+      if(result?.status == 200) {
+        setPostsArray(result.data);
+        console.log(result.data);
+      }
+      else {
+        console.log("Error fetchin posts")
+      };
+
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
   }
 
   return (
