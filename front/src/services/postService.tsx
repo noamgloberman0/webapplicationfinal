@@ -25,7 +25,6 @@ export const createPost = async (postData: FormData) => {
     }
 };
 
-
 export const fetchPosts = async () => {
     const { accessToken, refreshToken } = getTokens();
 
@@ -68,4 +67,28 @@ export const postsByUser = async (userId: string) => {
         throw error;
     }
 
+};
+
+export const likePost = async (postData: any) => {
+    const { accessToken, refreshToken } = getTokens();
+
+    const postId = postData.id;
+    
+    try {
+        const response = await axios.put(
+            `${BACKEND_URL}/posts/${postId}`,
+            postData,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error updating post:", error);
+        throw error;
+    }
 };

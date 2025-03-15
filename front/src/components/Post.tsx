@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 // Types
 import { Post as PostType } from '../types';
+
+// Services
+import { likePost } from '../services/postService';
 
 // Icons
 import { Heart, MessageCircle } from 'lucide-react';
@@ -15,6 +18,7 @@ export default function Post({ post }: PostProps) {
 
   // User info
   const [userInfo] = useState(post?.user ? JSON.parse(post.user) : {});
+  const userID = localStorage.getItem('_id') || '';
 
   // Likes
   const [isLiked, setIsLiked] = useState(false);
@@ -24,19 +28,36 @@ export default function Post({ post }: PostProps) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [postComments, setPostComments] = useState<any>([]);
+  
+  // Check if the current user has liked the post 
+  useEffect(() => {
+    setIsLiked(post.likes.includes(userID));
+  }, [post]);
+  
 
   // Functions
 
   const handleLike = async () => {
 
-    // like post logic here
+    const updatedLikes = isLiked ? 
+      post.likes.filter((liker) => liker !== userID) : 
+      [...new Set([...post.likes, userID])];
+
+    const postData = {
+      id: post._id,
+      likes: updatedLikes,
+    };
+
+    await likePost(postData);
+
+    setIsLiked(!isLiked);
+    setLikeNum(isLiked ? likeNum - 1 : likeNum + 1);
   };
 
   const handleNewComment = async (e: React.FormEvent) => {
     e.preventDefault();
     // New comment logic here
   };
-
 
   return (
     <div id={post._id} className="bg-white rounded-lg shadow-md mb-6">
@@ -61,7 +82,6 @@ export default function Post({ post }: PostProps) {
               </p>
             </div>
           </div>
-
         </div>
 
         <p className="mb-4">{post.content}</p>
