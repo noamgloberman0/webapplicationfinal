@@ -12,6 +12,7 @@ import Post from '../components/Post';
 import CreatePost from '../components/CreatePost';
 
 // Services
+import { postsByUser } from '../services/postService';
 import { getUser, updateUser } from '../services/usersService';
 import { updateImage } from '../services/globalService';
 
@@ -59,7 +60,18 @@ export default function Profile() {
   }
 
   const getPosts = async () => {
+    try {
+      const result = await postsByUser(profileID);
+      if(result?.status == 200) {
+        setUserPosts(result.data);
+      }
+      else {
+        console.log("Error fetchin posts")
+      };
 
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,6 +110,7 @@ export default function Profile() {
   };
 
   const handleUpload = async(e: any) => {
+
     e.preventDefault();
     const fileExtension = e.target.files[0].name.split('.').pop();
     const fileName = `${user?.email}.${fileExtension}`;
