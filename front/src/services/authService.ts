@@ -57,13 +57,31 @@ export const verify = async () => {
   }
 };
 
-// export const logout = async () => {
-//   try {
 
-//   } catch (error) {
-//     console.log("Error logging out:", error);
-//   }
-// };
+export const logout = async () => {
+  try {
+    const { refreshToken } = getTokens();
+
+    const response = await axios.post(`${BACKEND_URL}/auth/logout`, {
+      refreshToken,
+    }, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("_id");
+    localStorage.removeItem("username");
+    localStorage.removeItem("email");
+    localStorage.removeItem("profilePicture");
+
+    return response;
+  } catch (error) {
+    console.log("Error logging out:", error);
+  }
+};
 
 export const refresh = async () => {
     try {
