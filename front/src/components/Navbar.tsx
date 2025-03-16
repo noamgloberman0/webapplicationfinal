@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Home, User, LogOut } from 'lucide-react';
+import { Search, Home, User, LogOut, MessageCircle } from 'lucide-react';
 
 // Interfaces
 import *  as Interfaces from '../types/index';
+
+// Services
+import { fetchUsers } from '../services/usersService';
+import { logout } from '../services/authService';
 
 export default function Navbar() {
   
@@ -13,6 +17,15 @@ export default function Navbar() {
   
   const id = localStorage.getItem('_id');
 
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await fetchUsers();
+      setUsers(response?.data);
+    };
+    fetchData();
+  }, []);
+
+
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     const results = users.filter(user => user.username.toLowerCase().includes(query.toLowerCase()));
@@ -20,7 +33,7 @@ export default function Navbar() {
   };
 
   const handleLogout = async () => {
-    // Logout Logic here
+    await logout();
   };
 
   return (
@@ -75,6 +88,9 @@ export default function Navbar() {
             </Link>
             <Link to={`/profile/${id}`} className="p-2 hover:bg-gray-100 rounded-full">
               <User className="h-6 w-6" />
+            </Link>
+            <Link to={`/chat`} className="p-2 hover:bg-gray-100 rounded-full">
+              <MessageCircle className="h-6 w-6" />
             </Link>
             <Link to="/login" onClick={handleLogout} className="p-2 hover:bg-gray-100 rounded-full">
               <LogOut className="h-6 w-6" />
