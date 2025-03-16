@@ -1,7 +1,59 @@
 import axios from "axios";
 import { BACKEND_URL } from "../globalVariables";
 import { getTokens } from "./globalService";
+import { io, Socket } from "socket.io-client";
+import { create } from "zustand";
 
+interface AuthState {
+  socket: Socket | null;
+  onlineUsers: string[];
+  connectSocket: () => void;
+  disconnectSocket: () => void;
+}
+
+export const useAuthStore = create<AuthState>((set, get) => ({
+  socket: null,
+  onlineUsers: [],
+
+  connectSocket: () => {
+    const userId = localStorage.getItem("_id");
+    if (!userId) {
+      console.log("User ID not found in localStorage");
+      return;
+    }
+
+    if (get().socket?.connected) {
+      console.log("Socket already connected");
+      return;
+    }
+
+    console.log("Connecting to socket server at", BACKEND_URL);
+    const socket = io(BACKEND_URL, {
+      query: {
+        userId,
+      },
+    });
+
+    socket.on("connect", () => {
+      console.log("Connected to socket server with socket ID:", socket.id);
+      set({ socket });
+    });
+
+    socket.on("getOnlineUsers", (userIds: string[]) => {
+      console.log("Received online users:", userIds);
+      set({ onlineUsers: userIds });
+    });
+  },
+
+  disconnectSocket: () => {
+    const { socket } = get();
+    if (socket?.connected) {
+      socket.disconnect();
+      console.log("Disconnected from socket server");
+      set({ socket: null });
+    }
+  },
+}));
 
 export const login = async (user_email: string, password: string) => {
   try {
@@ -18,6 +70,7 @@ export const login = async (user_email: string, password: string) => {
     localStorage.setItem("profilePicture", profilePicture);
 
     console.log("Login successful, connecting to socket...");
+    useAuthStore.getState().connectSocket();
 
     return response;
   } catch (error) {
@@ -57,7 +110,6 @@ export const verify = async () => {
   }
 };
 
-
 export const logout = async () => {
   try {
     const { refreshToken } = getTokens();
@@ -69,6 +121,8 @@ export const logout = async () => {
         "Content-Type": "application/json",
       },
     });
+
+    useAuthStore.getState().disconnectSocket();
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
@@ -104,3 +158,22 @@ export const refresh = async () => {
     }
 };
 
+export const googleLogin = async (credentialResponse: any) => {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/auth/google`, {
+        credential: credentialResponse.credential
+      });
+      
+      const { accessToken, refreshToken, _id, username, email, profilePicture } = response.data;
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      localStorage.setItem("_id", _id);
+      localStorage.setItem("username", username);
+      localStorage.setItem("email", email);
+      localStorage.setItem("profilePicture", profilePicture);
+      
+      return response;
+    } catch (error) {
+      console.log("Error logging in with Google:", error);
+    }
+  };

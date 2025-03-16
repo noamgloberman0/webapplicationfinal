@@ -39,6 +39,13 @@ export default function Profile() {
     setEditMode(false);
   }, [profileID]);
 
+  // Reroute user to chat page
+  useEffect(() => {
+    if (showChat) {
+      window.location.href = `/chat?id=${profileID}`;
+    }
+  }, [showChat]);
+
   const getUserDetails = async (profileID: string) => {
 
     try {
