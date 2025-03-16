@@ -45,3 +45,47 @@ export const fetchComments = async (postID: string) => {
     }
 };
 
+
+export const updateComment = async (commentData: FormData) => {
+    const { accessToken, refreshToken } = getTokens();
+    const commentID = commentData.get("commentId") as string;
+
+    console.log(commentID)
+    try {
+        const response = await axios.put(
+            `${BACKEND_URL}/comments/${commentID}`,
+            commentData,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error updating comment:", error);
+        throw error;
+    }
+};
+
+export const deleteComment = async (commentID: string) => {
+    const { accessToken, refreshToken } = getTokens();
+    try {
+        const response = await axios.delete(
+            `${BACKEND_URL}/comments/${commentID}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        throw error;
+    }
+};
