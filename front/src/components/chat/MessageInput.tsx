@@ -1,14 +1,23 @@
 import { useState } from "react";
-
-// Icons
+import { useChatStore } from "../../services/chatService";
 import { Send } from "lucide-react";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
+  const sendMessage = useChatStore((state) => state.sendMessage);
+  const selectedUser = useChatStore((state) => state.selectedUser);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add logic here
+    if (!text.trim() || !selectedUser) return;
+
+    try {
+      await sendMessage(text.trim());
+      // Clear form
+      setText("");
+    } catch (error) {
+      console.error("Failed to send message:", error);
+    }
   };
 
   return (

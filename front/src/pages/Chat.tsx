@@ -1,10 +1,11 @@
+import { useChatStore } from "../services/chatService";
+
 import Sidebar from "../components/chat/Sidebar";
 import NoChatSelected from "../components/chat/NoChatSelected";
 import ChatContainer from "../components/chat/ChatContainer";
-import { useState } from "react";
 
 const Chat = () => {
-  const [selectedUser, setSelectedUser] = useState<boolean>(false);
+  const { selectedUser } = useChatStore();
 
   return (
     <div className="h-screen bg-base-200">

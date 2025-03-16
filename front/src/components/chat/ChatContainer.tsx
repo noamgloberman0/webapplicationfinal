@@ -5,16 +5,39 @@ import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
 
+// Services
+import { useChatStore } from "../../services/chatService";
+
 
 const ChatContainer = () => {
+  const { messages, isMessagesLoading, selectedUser} = useChatStore();
 
   const authUserId: any = localStorage.getItem('_id');
   const messageEndRef = useRef<HTMLDivElement>(null);
 
-  const [isMessagesLoading, setIsMessagesLoading] = useState<any[]>([]);
-  const [messages, setMessages] = useState<any[]>([]);
-  const [selectedUser, setSelectedUser] = useState<any>({});
+  const getMessages = useChatStore((state) => state.getMessages);
+  const subscribeToMessages = useChatStore((state) => state.subscribeToMessages);
+  const unsubscribeFromMessages = useChatStore((state) => state.unsubscribeFromMessages);
+
   const [myProfileImage] = useState<string>((localStorage.getItem('profilePicture') || ''));
+  
+  // Get messages and subscribe to new messages
+  useEffect(() => {
+    if (selectedUser) {
+      getMessages(selectedUser._id);
+      subscribeToMessages();
+    }
+
+    return () => unsubscribeFromMessages();
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+
+  
+  // Scroll to the bottom of the chat
+  useEffect(() => {
+    if (messageEndRef.current && messages.length > 0) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
 
   // Format message time
