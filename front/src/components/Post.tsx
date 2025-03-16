@@ -7,7 +7,7 @@ import { Post as PostType } from '../types';
 // Services
 import { updateImage } from '../services/globalService';
 import { updatePost, deletePost, likePost } from '../services/postService';
-import { createComment, fetchComments } from '../services/commentService';
+import { createComment, fetchComments, updateComment } from '../services/commentService';
 
 // Icons
 import { Heart, MessageCircle, Share, Settings2, Edit, Trash, Image, X } from 'lucide-react';
@@ -42,6 +42,9 @@ export default function Post({ post }: PostProps) {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [postComments, setPostComments] = useState<any>([]);
+  const [showCommentSettings, setShowCommentSettings] = useState(false);
+  const [editedCommentID, setEditedCommentID] = useState('');
+  const [editedComment, setEditedComment] = useState('');
   const [isCurrentlyEdited, setIsCurrentlyEdited] = useState(false);
 
   // Get comments of post
@@ -104,6 +107,29 @@ export default function Post({ post }: PostProps) {
       alert('Something went wrong while creating your comment. Please try again later.');
     }
   };
+
+  const handleUpdateComment = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!editedComment.trim()) return;
+
+    const formData = new FormData();
+    
+    formData.append('user', JSON.stringify(user)); // Comment Sender
+    formData.append('commentId', editedCommentID); // Comment ID to edit
+    formData.append('content', editedComment); // Comment content
+
+    const result = await updateComment(formData);
+
+    if(result?.status === 200) {
+      window.location.href = `/home#${post._id}`;
+      window.location.reload();
+    }
+    else {
+      console.error('Error updating comment:', result);
+      alert('Something went wrong while updating your comment. Please try again later.');
+    }
+  }
 
   const handleUpdatePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -285,6 +311,76 @@ export default function Post({ post }: PostProps) {
             />
           </form>
 
+          <div className="space-y-4">
+            {postComments.length > 0 && postComments.map((comment: any) => (
+              <div key={comment._id} id={comment._id} className="flex items-start space-x-3">
+                
+                {/* Comment Creator */}
+                <img
+                  src={comment?.user ? JSON.parse(comment.user).profilePicture : ""}
+                  alt={comment?.user ? JSON.parse(comment.user).name : ""}
+                  className="w-8 h-8 rounded-full"
+                />
+                
+                <div className='bg-gray-100 w-full p-2 rounded-lg flex items-start space-x-3'>
+
+                  {/* Comment Content */}
+                  <div className="flex-1">
+
+                    <div className="rounded-lg p-3">
+                      <Link to={`/profile/${comment.userId}`}>
+                        <span className="font-semibold">{comment?.user ? JSON.parse(comment.user).name : ""}</span>
+                      </Link>
+
+                        {comment.userId === userID && comment._id === editedCommentID && isCurrentlyEdited ? (
+                          <form onSubmit={(e) => handleUpdateComment(e)} className="mb-4">
+                            <input
+                            type="text"
+                            value={editedComment}
+                            onChange={(e) => setEditedComment(e.target.value)}
+                            placeholder="Edit your comment..."
+                            className="mt-2 w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-indigo-500"
+                            />
+                          </form>
+                        ) : (
+                          <p>{comment.content}</p>
+                        )}
+
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </p>
+
+                  </div>
+
+                  {/* Edit / Delete - Display only for creator */}
+                  {comment.userId === userID && (
+                    <div>
+                      <button onClick={() => {
+                          setEditedCommentID(comment._id);
+                          setShowCommentSettings(!showCommentSettings) }
+                        } className="flex items-center space-x-2 text-gray-500">
+                        <Settings2 className="h-5 w-5" />
+                      </button>
+                      
+                      
+                      {showCommentSettings && comment._id === editedCommentID && (
+                        <div className='absolute bg-white shadow-md p-2 rounded-lg space-y-2' style={{ marginLeft: '-20px' }}>
+                            <button onClick={() => setIsCurrentlyEdited(!isCurrentlyEdited)} 
+                            className="flex items-center space-x-2 text-gray-500 hover:bg-gray-200 p-1 rounded"
+                            >
+                              <Edit className="h-5 w-5" />
+                            </button>
+                      
+                        </div>
+                      )}
+
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
