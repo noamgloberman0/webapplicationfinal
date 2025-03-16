@@ -7,7 +7,7 @@ import { Post as PostType } from '../types';
 // Services
 import { updateImage } from '../services/globalService';
 import { updatePost, deletePost, likePost } from '../services/postService';
-import { createComment, fetchComments, updateComment } from '../services/commentService';
+import { createComment, fetchComments, updateComment, deleteComment } from '../services/commentService';
 
 // Icons
 import { Heart, MessageCircle, Share, Settings2, Edit, Trash, Image, X } from 'lucide-react';
@@ -128,6 +128,19 @@ export default function Post({ post }: PostProps) {
     else {
       console.error('Error updating comment:', result);
       alert('Something went wrong while updating your comment. Please try again later.');
+    }
+  }
+
+  const handleDeleteComment = async () => {
+    const result = await deleteComment(editedCommentID);
+
+    if(result?.status === 200) {
+      window.location.href = `/home#${post._id}`;
+      window.location.reload();
+    }
+    else {
+      console.error('Error deleting comment:', result);
+      alert('Something went wrong while deleting your comment. Please try again later.');
     }
   }
 
@@ -370,6 +383,12 @@ export default function Post({ post }: PostProps) {
                             className="flex items-center space-x-2 text-gray-500 hover:bg-gray-200 p-1 rounded"
                             >
                               <Edit className="h-5 w-5" />
+                            </button>
+
+                            <button onClick={handleDeleteComment} 
+                            className="flex items-center space-x-2 text-gray-500 hover:bg-gray-200 p-1 rounded"
+                            >
+                              <Trash className="h-5 w-5" />
                             </button>
                       
                         </div>
