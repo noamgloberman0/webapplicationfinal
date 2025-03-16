@@ -6,11 +6,11 @@ import { Post as PostType } from '../types';
 
 // Services
 import { updateImage } from '../services/globalService';
-import { updatePost, likePost } from '../services/postService';
+import { updatePost, deletePost, likePost } from '../services/postService';
 import { createComment, fetchComments } from '../services/commentService';
 
 // Icons
-import { Heart, MessageCircle, Settings2, Edit, Image, X } from 'lucide-react';
+import { Heart, MessageCircle, Share, Settings2, Edit, Trash, Image, X } from 'lucide-react';
 
 interface PostProps {
   post: PostType;
@@ -105,7 +105,6 @@ export default function Post({ post }: PostProps) {
     }
   };
 
-
   const handleUpdatePost = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -155,6 +154,18 @@ export default function Post({ post }: PostProps) {
 
   }
   
+  const handleDeletePost = async () => {
+    const result = await deletePost(editedPostID);
+
+    if(result?.status === 200) {
+      window.location.href = `/home`;
+      window.location.reload();
+    }
+    else {
+      console.error('Error deleting post:', result);
+      alert('Something went wrong while deleting your post. Please try again later.');
+    }
+  }
 
   // Upload New Post Image
   const handleUpload = async(e: any) => {
@@ -211,6 +222,12 @@ export default function Post({ post }: PostProps) {
                       className="flex items-center space-x-2 text-gray-500 hover:bg-gray-200 p-1 rounded"
                       >
                         <Edit className="h-5 w-5" />
+                      </button>
+
+                      <button onClick={handleDeletePost} 
+                      className="flex items-center space-x-2 text-gray-500 hover:bg-gray-200 p-1 rounded"
+                      >
+                        <Trash className="h-5 w-5" />
                       </button>
                 
                   </div>

@@ -117,3 +117,23 @@ export const updatePost = async (postData: FormData) => {
     }
 };
 
+export const deletePost = async (postId: string) => {
+    const { accessToken, refreshToken } = getTokens();
+
+    try {
+        const response = await axios.delete(
+            `${BACKEND_URL}/posts/${postId}`,
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${accessToken}`,
+                    "x-refresh-token": refreshToken,
+                },
+            }
+        );
+        return response;
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        throw error;
+    }
+};
