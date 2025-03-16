@@ -8,6 +8,7 @@ import PersistLogin from './components/persistLogin';
 // Pages
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import Chat from './pages/Chat';
 import Login from './pages/Login';
 import SignUp from './pages/SignUp';
 
@@ -32,7 +33,12 @@ function App() {
                     <Profile />
                   </>
                 }/>
-              
+              <Route path="/chat" element={
+                  <>
+                    <Navbar />
+                    <Chat />
+                  </>
+                }/>
             </Route>
             
           </Routes>
