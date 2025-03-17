@@ -10,7 +10,7 @@ import { updatePost, deletePost, likePost } from '../services/postService';
 import { createComment, fetchComments, updateComment, deleteComment } from '../services/commentService';
 
 // Icons
-import { Heart, MessageCircle, Share, Settings2, Edit, Trash, Image, X } from 'lucide-react';
+import { Heart, MessageCircle, Settings2, Edit, Trash, Image, X } from 'lucide-react';
 
 interface PostProps {
   post: PostType;
