@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Components
 import Navbar from './components/Navbar';
@@ -50,16 +51,18 @@ function App() {
   };
 
   return (
-    <Router>
-      <Routes>
-        {/* Private Routes */}
-        <Route path='/*' element={<PrivateRoutes />} />
-        
-        {/* Public Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<SignUp />} />
-      </Routes>
-    </Router>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+      <Router>
+        <Routes>
+          {/* Private Routes */}
+          <Route path='/*' element={<PrivateRoutes />} />
+          
+          {/* Public Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<SignUp />} />
+        </Routes>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 

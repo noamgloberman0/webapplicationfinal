@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { login, googleLogin } from '../services/authService';
+import { GoogleLogin } from '@react-oauth/google';
 
-// Services
-import { login } from '../services/authService';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -69,6 +69,20 @@ export default function Login() {
               Login
             </button>
           </form>
+
+          <div className="mt-4">
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                const result = await googleLogin(credentialResponse);
+                if(result?.status === 200) {
+                  window.location.href = '/home';
+                }
+              }}
+              onError={() => {
+                console.log('Login Failed');
+              }}
+            />
+          </div>
 
           <p className="mt-6 text-center text-gray-600">
             Don't have an account?{' '}

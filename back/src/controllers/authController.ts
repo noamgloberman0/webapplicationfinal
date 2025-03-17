@@ -1,9 +1,55 @@
 import { Request, Response } from 'express';
 import { User } from '../models/user';
 import { IUser } from '../types/models';
+import { OAuth2Client } from 'google-auth-library';
 import dotenv from 'dotenv';
 dotenv.config();
 
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const googleLogin = async (req: Request, res: Response) => {
+  try {
+    const { credential } = req.body;
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    
+    if (!payload) {
+      return res.status(400).send('Invalid token');
+    }
+
+    // For Google login, we want to find OR create the user
+    let user = await User.findOne({ email: payload.email });
+    if (!user) {
+      const { month, year } = getCurrentMonthAndYear();
+      user = await User.create({
+        email: payload.email,
+        username: payload.name,
+        profilePicture: '/images/default.avif',
+        password: Math.random().toString(36),
+        month,
+        year
+      });
+    }
+
+    const tokens = generateToken(user._id);
+    if (!tokens) {
+      return res.status(500).send('Server Error');
+    }
+    res.status(200).send({
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture
+    });
+  } catch (error) {
+    res.status(400).send(error);
+  }
+};
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
@@ -284,5 +330,6 @@ export {
     refresh,
     verifyRefreshToken,
     logout,
-    verify
+    verify,
+    googleLogin
 };
