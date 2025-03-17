@@ -1,5 +1,5 @@
 import express, { Router } from 'express';
-import { register, login, refresh, logout, verify } from "../controllers/authController";
+import { register, login, refresh, logout, verify, googleLogin } from "../controllers/authController";
 import multer from 'multer';
 import { authMiddleware } from "../middlewares/authMiddleware";
 
@@ -136,6 +136,8 @@ router.post("/logout", logout);
 router.post("/refresh", refresh);
 
 router.get("/verify", authMiddleware, verify);
+
+router.post("/google", googleLogin);
 
 export default router;
 
