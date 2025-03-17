@@ -11,6 +11,7 @@ import usersRouter from './routes/users';
 import postsRouter from './routes/posts';
 import commentsRouter from './routes/comments';
 import messageRouter from './routes/messages';
+import geminiRoutes from './routes/geminiRoutes'; // Import Gemini routes
 
 import cors from 'cors';
 import bodyParser from 'body-parser';
@@ -55,6 +56,7 @@ app.use('/users', usersRouter);
 app.use('/posts', postsRouter);
 app.use('/comments', commentsRouter);
 app.use('/messages', messageRouter);
+app.use('/api/gemini', geminiRoutes);
 
 export const initApp = async (): Promise<Express> => {
   await mongoose.connect(mongoUri);
