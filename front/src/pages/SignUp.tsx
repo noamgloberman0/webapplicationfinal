@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+
+// Services
 import { register } from '../services/authService';
+
+// Icons 
+import { Image } from 'lucide-react';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -11,9 +16,6 @@ export default function SignUp() {
   const [imageName, setImageName] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
-  const [formData, setFormData] = useState(new FormData());
-
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,14 +47,14 @@ export default function SignUp() {
     }
   };
 
-  const handleUpload = async(e: any) => {
+  const handleUpload = (e: any) => {
 
     e.preventDefault();
     const fileExtension = e.target.files[0].name.split('.').pop();
     const fileName = `${email}.${fileExtension}`;
 
-    await setImageName(fileName);
-    await setImageFile(e.target.files[0]);
+    setImageName(fileName);
+    setImageFile(e.target.files[0]);
 
   }
 
@@ -144,10 +146,16 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor='profilePicture' className="block text-sm font-medium text-gray-700">
-                Profile Picture
-              </label>
-              <input type = "file" id = "profilePictureRegister" onChange = {handleUpload}/>
+              <button
+                type="button"
+                onClick={() => { window.document.getElementById('file-upload')?.click(); }}
+                className="flex items-center space-x-2 text-gray-500 hover:text-gray-700" >
+                <Image className="h-5 w-5" />
+                {imageFile.size === 0 ? <span>Add Image</span> : <span>Replace Image</span>}
+              </button>
+              
+              <input type="file" id="file-upload" name="image" accept=".png, .jpeg, .jpg" onChange={handleUpload} />
+
             </div>
 
             <button
