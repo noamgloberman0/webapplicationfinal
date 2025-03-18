@@ -36,6 +36,11 @@ const testUser: User = {
   username: "test",
   email: "test@user.com",
   password: "testpassword",
+  profilePicture: "default.png",
+  city: "Test City",
+  country: "Test Country",
+  month: "January",
+  year: "2000"
 }
 
 describe("Auth Tests", () => {
