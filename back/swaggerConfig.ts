@@ -1,5 +1,7 @@
 import swaggerJsdoc, { Options } from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const options: Options = {
     definition: {
@@ -11,8 +13,11 @@ const options: Options = {
         },
         servers: [
             {
-                url: 'http://localhost:3000',
+                url: 'http://localhost:' + process.env.PORT,
             },
+            {
+                url: process.env.DOMAIN_BASE,
+            }
         ],
     },
     apis: ['./src/routes/*.ts', './src/controllers/*.ts'],
