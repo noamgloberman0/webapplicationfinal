@@ -10,5 +10,8 @@
     "resolveJsonModule": true
   },
   "lib": ["es2015"],
-  "exclude": [".tests"]
+  "exclude": [
+    "tests/",
+    "jest.config.ts"
+  ]
 }
