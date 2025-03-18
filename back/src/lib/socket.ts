@@ -8,8 +8,8 @@ const app = express();
 var server = http.createServer(app);
 if (process.env.NODE_ENV == "production"){
   const prop = {
-    key: fs.readFileSync("./client-key.pem"),
-    cert: fs.readFileSync("./client-cert.pem")
+    key: fs.readFileSync("../client-key.pem"),
+    cert: fs.readFileSync("../client-cert.pem")
   }
   server = https.createServer(prop ,app)
 }

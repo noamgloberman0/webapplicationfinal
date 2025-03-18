@@ -57,6 +57,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
 export const login = async (user_email: string, password: string) => {
   try {
+    console.log(BACKEND_URL);
     const response = await axios.post(`${BACKEND_URL}/auth/login`, {
       email: user_email,
       password,
@@ -160,6 +161,7 @@ export const refresh = async () => {
 
 export const googleLogin = async (credentialResponse: any) => {
     try {
+      console.log(`${BACKEND_URL}/auth/google`)
       const response = await axios.post(`${BACKEND_URL}/auth/google`, {
         credential: credentialResponse.credential
       });

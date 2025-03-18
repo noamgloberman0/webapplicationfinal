@@ -1,9 +1,10 @@
 module.exports = {
   apps : [{
-    name   : "back",
-    script : "./dist/src/server.js",
+    name   : "front",
+    script : "npm run prod",
     env_production: {
         NODE_ENV: "production"
     }
   }]
 }
+  
