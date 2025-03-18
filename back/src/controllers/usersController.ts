@@ -51,8 +51,14 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 
         // Don't process file operations if dealing with default avatar
         if (currentUser.profilePicture !== '/images/default.avif' && profilePicture !== '/images/default.avif') {
-            const oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${currentUser.email}.jpg`);
-            const newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${email}.jpg`);
+            let oldFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${currentUser.email}.jpg`);
+            let newFilePath = path.join(path.resolve(), '..', 'front', 'public', 'images', `${email}.jpg`);
+            
+            if (fs.existsSync(oldFilePath)) {
+                fs.renameSync(oldFilePath, newFilePath);
+            }
+            oldFilePath = path.join(path.resolve(), '..', 'front', 'dist', 'images', `${currentUser.email}.jpg`);
+            newFilePath = path.join(path.resolve(), '..', 'front', 'dist', 'images', `${email}.jpg`);
             
             if (fs.existsSync(oldFilePath)) {
                 fs.renameSync(oldFilePath, newFilePath);

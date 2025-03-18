@@ -136,12 +136,12 @@ export default function Profile() {
 
           <div className="p-6">
             <div className="flex flex-col sm:flex-row items-center sm:items-end -mt-20">
-              {user && !editMode && (<img
+              {user && !editMode  && (<img
                 src={user.profilePicture}
                 alt={user.profilePicture}
                 className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
               />)}
-              {editMode && (
+              {user && editMode && (
                 <label>
                   <input type="file" id="file-upload" accept=".png, .jpeg, .jpg"  name="profile-pic" onChange = {handleUpload} />
                   <div className = "image-container">

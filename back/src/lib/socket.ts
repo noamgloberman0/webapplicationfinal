@@ -16,7 +16,8 @@ if (process.env.NODE_ENV == "production"){
 
 const io = new Server(server, {
   cors: {
-    origin: [process.env.DOMAIN_BASE || "http://localhost:5173"],
+    origin: "*",
+    credentials: true
   },
 });
 

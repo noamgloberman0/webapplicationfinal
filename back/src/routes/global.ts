@@ -1,9 +1,11 @@
 import express, { Router } from 'express';
 import { authMiddleware } from "../middlewares/authMiddleware";
 import multer from 'multer';
+import fse from 'fs-extra';
 
 const router: Router = express.Router();
 const imageUploadPath = process.env.LOCAL_IMAGE_PATH || '../front/public/images';
+const imageUploadDistPath = '../front/dist/images';
 
 const storage = multer.diskStorage({
   destination: function (req: any, file: any, cb: any) {
@@ -47,6 +49,13 @@ const imageUpload = multer({ storage: storage });
  *               example: success
  */
 router.post('/updateImage', authMiddleware, imageUpload.single("image"), (req, res) => {
+  fse.copy(imageUploadPath, imageUploadDistPath, function (err: any) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log("success!");
+    }
+  });
   res.send({status: 200, message: "success"})
 });
 

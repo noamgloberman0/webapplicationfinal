@@ -1,3 +1,6 @@
 **/node_modules/
 **/dist/
+**/*.pem
+**/*.csr
+front/public/images/*
 backend/.env
