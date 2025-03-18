@@ -1,9 +1,18 @@
 import { Server } from "socket.io";
 import http from "http";
+import https from "https";
 import express from "express";
+import fs from "fs";
 
 const app = express();
-const server = http.createServer(app);
+var server = http.createServer(app);
+if (process.env.NODE_ENV == "production"){
+  const prop = {
+    key: fs.readFileSync("./client-key.pem"),
+    cert: fs.readFileSync("./client-cert.pem")
+  }
+  server = https.createServer(prop ,app)
+}
 
 const io = new Server(server, {
   cors: {
