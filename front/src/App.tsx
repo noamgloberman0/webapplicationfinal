@@ -22,24 +22,25 @@ function App() {
         {isLoggedIn !== false ? (
           <Routes>
             <Route element={<PersistLogin isLoggedIn={isLoggedIn} setIsLoggedIn={setIsLoggedIn} />}>
+              <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={   
-                <>     
-                  <Navbar />     
-                  <Home />   
-                </> 
+              <>     
+                <Navbar />     
+                <Home />   
+              </> 
               }/>
               <Route path="/profile/:id" element={
-                  <>
-                    <Navbar />
-                    <Profile />
-                  </>
-                }/>
+                <>
+                <Navbar />
+                <Profile />
+                </>
+              }/>
               <Route path="/chat" element={
-                  <>
-                    <Navbar />
-                    <Chat />
-                  </>
-                }/>
+                <>
+                <Navbar />
+                <Chat />
+                </>
+              }/>
             </Route>
             
           </Routes>
